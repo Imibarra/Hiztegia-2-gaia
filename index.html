@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="eu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15803d">
+  <meta name="description" content="Euskara eta gaztelania lotzeko Beta-Urreko memoria-jokoa">
+  <title>2. gaia Hiztegia · Beta-Urreko</title>
+  <style>
+    :root {
+      --subject: #15803d;
+      --subject-dark: #14532d;
+      --subject-soft: #dcfce7;
+      --bg: #eef5f0;
+      --surface: #ffffff;
+      --surface-2: #f7faf8;
+      --text: #17211b;
+      --muted: #647067;
+      --border: #cbd8ce;
+      --correct: #2e7d32;
+      --correct-soft: #e8f5e9;
+      --error: #c62828;
+      --error-soft: #ffebee;
+      --info: #1e6f9f;
+      --shadow: 0 20px 55px rgba(20, 83, 45, .12);
+      --radius-xl: 28px;
+      --radius-lg: 19px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 2%, rgba(21, 128, 61, .11), transparent 27rem),
+        radial-gradient(circle at 92% 14%, rgba(20, 83, 45, .08), transparent 25rem),
+        linear-gradient(180deg, #f8fbf8, var(--bg));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    button { font: inherit; }
+    [hidden] { display: none !important; }
+
+    .app {
+      width: min(100% - 26px, 1240px);
+      margin: 0 auto;
+      padding: 22px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 15px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--subject-dark);
+      font-weight: 850;
+      letter-spacing: -.02em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 43px;
+      height: 43px;
+      place-items: center;
+      border-radius: 14px;
+      color: #fff;
+      background: var(--subject);
+      box-shadow: 0 8px 18px rgba(21, 128, 61, .24);
+      font-size: .92rem;
+      letter-spacing: .03em;
+    }
+
+    .screen {
+      overflow: hidden;
+      border: 1px solid rgba(21, 128, 61, .17);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, .97);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: clamp(30px, 6vw, 60px);
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.1), transparent 55%),
+        linear-gradient(135deg, var(--subject-dark), var(--subject));
+    }
+
+    .eyebrow {
+      margin: 0 0 9px;
+      font-size: .8rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .88;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 780px;
+      margin-bottom: 13px;
+      font-size: clamp(2.35rem, 7vw, 4.6rem);
+      line-height: .99;
+      letter-spacing: -.05em;
+    }
+
+    .hero-copy {
+      max-width: 700px;
+      margin-bottom: 0;
+      font-size: clamp(1.02rem, 2.4vw, 1.22rem);
+      opacity: .95;
+    }
+
+    .setup {
+      display: grid;
+      gap: 26px;
+      padding: clamp(25px, 5vw, 44px);
+    }
+
+    .section-title {
+      margin-bottom: 13px;
+      color: var(--subject-dark);
+      font-weight: 900;
+    }
+
+    .levels {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .level {
+      min-height: 116px;
+      padding: 17px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      color: var(--text);
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+
+    .level:hover {
+      border-color: rgba(21, 128, 61, .56);
+      transform: translateY(-2px);
+    }
+
+    .level[aria-pressed="true"] {
+      border-color: var(--subject);
+      color: var(--subject-dark);
+      background: var(--subject-soft);
+      box-shadow: 0 0 0 4px rgba(21, 128, 61, .1);
+    }
+
+    .level-name {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 1.27rem;
+      font-weight: 900;
+    }
+
+    .level-count {
+      display: block;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 750;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      min-height: 50px;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 23px;
+      border: 2px solid transparent;
+      border-radius: 999px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+
+    .btn-primary {
+      color: #fff;
+      background: var(--subject);
+      box-shadow: 0 9px 20px rgba(21, 128, 61, .22);
+    }
+
+    .btn-primary:hover:not(:disabled) { background: var(--subject-dark); }
+
+    .btn-secondary {
+      color: var(--subject-dark);
+      border-color: rgba(21, 128, 61, .35);
+      background: #fff;
+    }
+
+    .btn:focus-visible,
+    .level:focus-visible,
+    .memory-card:focus-visible,
+    .icon-btn:focus-visible {
+      outline: 4px solid rgba(30, 111, 159, .3);
+      outline-offset: 3px;
+    }
+
+    .game-head {
+      padding: 20px clamp(18px, 4vw, 34px);
+      color: #fff;
+      background: var(--subject-dark);
+    }
+
+    .game-head-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .game-title {
+      margin: 0;
+      font-size: clamp(1.25rem, 3vw, 1.7rem);
+      line-height: 1.15;
+    }
+
+    .progress-text {
+      flex: 0 0 auto;
+      font-weight: 850;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress-track {
+      overflow: hidden;
+      height: 9px;
+      margin-top: 15px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.22);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: #fff;
+      transition: width .3s ease;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 13px clamp(18px, 4vw, 34px);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .stat {
+      color: var(--muted);
+      text-align: center;
+      font-size: .79rem;
+      font-weight: 700;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--text);
+      font-size: 1.18rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .message {
+      min-height: 56px;
+      margin: 18px clamp(18px, 4vw, 34px) 0;
+      padding: 13px 16px;
+      border: 1px solid #b8d9c1;
+      border-radius: var(--radius-md);
+      color: var(--subject-dark);
+      background: var(--subject-soft);
+      font-weight: 750;
+    }
+
+    .message.error {
+      border-color: #ef9a9a;
+      color: #8e1b1b;
+      background: var(--error-soft);
+    }
+
+    .message.correct {
+      border-color: #9dd0a1;
+      color: #1b5e20;
+      background: var(--correct-soft);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(14px, 3vw, 28px);
+      padding: 18px clamp(18px, 4vw, 34px) 28px;
+    }
+
+    .language-zone {
+      min-width: 0;
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface-2);
+    }
+
+    .zone-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 13px;
+    }
+
+    .zone-title h3 {
+      margin: 0;
+      color: var(--subject-dark);
+      font-size: 1rem;
+    }
+
+    .zone-chip {
+      padding: 4px 9px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: #edf2ee;
+      font-size: .74rem;
+      font-weight: 800;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    .memory-card {
+      position: relative;
+      min-width: 0;
+      min-height: 96px;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: transparent;
+      perspective: 900px;
+      cursor: pointer;
+    }
+
+    .memory-card:disabled { cursor: default; }
+
+    .card-inner {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      transform-style: preserve-3d;
+      transition: transform .38s ease;
+    }
+
+    .memory-card.revealed .card-inner,
+    .memory-card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      border-radius: inherit;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      text-align: center;
+    }
+
+    .card-back {
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,.24);
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.11), transparent 58%),
+        var(--subject);
+      box-shadow: 0 7px 14px rgba(20, 83, 45, .18);
+    }
+
+    .card-back::before {
+      content: "BU";
+      position: absolute;
+      right: -4px;
+      bottom: -18px;
+      color: rgba(255,255,255,.11);
+      font-size: 4.7rem;
+      font-weight: 950;
+      transform: rotate(-9deg);
+    }
+
+    .question-mark {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 2px solid rgba(255,255,255,.7);
+      border-radius: 50%;
+      font-size: 1.35rem;
+      font-weight: 900;
+    }
+
+    .card-front {
+      border: 2px solid var(--border);
+      color: var(--text);
+      background: #fff;
+      box-shadow: 0 7px 14px rgba(15, 23, 42, .08);
+      transform: rotateY(180deg);
+      font-size: clamp(.84rem, 1.55vw, 1rem);
+      font-weight: 850;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .memory-card.selected .card-front {
+      border-color: var(--info);
+      box-shadow: 0 0 0 4px rgba(30, 111, 159, .14);
+    }
+
+    .memory-card.matched .card-front {
+      border-color: var(--correct);
+      color: #1b5e20;
+      background: var(--correct-soft);
+      box-shadow: 0 0 0 3px rgba(46, 125, 50, .1);
+    }
+
+    .memory-card.mismatch .card-front {
+      border-color: var(--error);
+      color: #8e1b1b;
+      background: var(--error-soft);
+      animation: shake .3s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotateY(180deg) translateX(0); }
+      35% { transform: rotateY(180deg) translateX(-4px); }
+      70% { transform: rotateY(180deg) translateX(4px); }
+    }
+
+    .game-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 clamp(18px, 4vw, 34px) 28px;
+    }
+
+    dialog {
+      width: min(92vw, 680px);
+      max-height: 86vh;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-xl);
+      color: var(--text);
+      background: #fff;
+      box-shadow: 0 28px 80px rgba(15, 23, 42, .3);
+    }
+
+    dialog::backdrop {
+      background: rgba(15, 23, 42, .56);
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 20px 22px;
+      color: #fff;
+      background: var(--subject-dark);
+    }
+
+    .modal-head h2 { margin: 0; font-size: 1.35rem; }
+
+    .icon-btn {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.5);
+      border-radius: 50%;
+      color: #fff;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.3rem;
+    }
+
+    .modal-body {
+      overflow: auto;
+      max-height: calc(86vh - 80px);
+      padding: 23px;
+    }
+
+    .steps { margin: 0; padding-left: 22px; }
+    .steps li + li { margin-top: 9px; }
+
+    .result-main {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .result-badge {
+      display: grid;
+      width: 112px;
+      height: 112px;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--subject);
+      box-shadow: 0 12px 28px rgba(21, 128, 61, .23);
+      font-size: 1.6rem;
+      font-weight: 950;
+    }
+
+    .result-copy h2 {
+      margin-bottom: 6px;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      letter-spacing: -.04em;
+    }
+
+    .result-copy p { margin: 0; color: var(--muted); }
+
+    .result-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .result-detail {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+      text-align: center;
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 750;
+    }
+
+    .result-detail strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--text);
+      font-size: 1.25rem;
+    }
+
+    @media (max-width: 760px) {
+      .levels { grid-template-columns: 1fr; }
+      .level { min-height: 86px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .memory-card { min-height: 90px; }
+      .board { gap: 10px; padding-inline: 10px; }
+      .language-zone { padding: 10px; }
+      .zone-title { align-items: flex-start; flex-direction: column; gap: 4px; }
+      .card-front { font-size: .82rem; padding: 8px; }
+      .result-main { grid-template-columns: 1fr; text-align: center; }
+      .result-badge { margin: 0 auto; }
+    }
+
+    @media (max-width: 440px) {
+      .app { width: min(100% - 14px, 1240px); padding-top: 10px; }
+      .topbar { margin-inline: 5px; }
+      .hero { padding: 28px 22px; }
+      .setup { padding: 22px 18px; }
+      .message { margin-inline: 10px; }
+      .stats { padding-inline: 10px; }
+      .board { padding-bottom: 20px; }
+      .memory-card { min-height: 84px; }
+      .zone-chip { display: none; }
+      .game-footer { padding: 0 10px 20px; }
+      .game-footer .btn { width: 100%; }
+      .result-details { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div class="brand" aria-label="Beta-Urreko">
+        <span class="brand-mark" aria-hidden="true">BU</span>
+        <span>Beta-Urreko</span>
+      </div>
+      <button id="help-top" class="btn btn-secondary" type="button">Nola jokatu</button>
+    </div>
+
+    <section id="start-screen" class="screen">
+      <div class="hero">
+        <p class="eyebrow">Euskera · Hiztegia</p>
+        <h1>2. gaia Hiztegia</h1>
+        <p class="hero-copy">Bilatu gaztelaniazko eta euskarazko hitzen arteko bikoteak.</p>
+      </div>
+
+      <div class="setup">
+        <div>
+          <p class="section-title">Aukeratu zailtasuna</p>
+          <div class="levels" role="group" aria-label="Zailtasuna">
+            <button class="level" type="button" data-level="5" aria-pressed="true">
+              <span class="level-name">Erraza</span>
+              <span class="level-count">5 bikote · 10 karta</span>
+            </button>
+            <button class="level" type="button" data-level="10" aria-pressed="false">
+              <span class="level-name">Zaila</span>
+              <span class="level-count">10 bikote · 20 karta</span>
+            </button>
+            <button class="level" type="button" data-level="15" aria-pressed="false">
+              <span class="level-name">Finala</span>
+              <span class="level-count">15 bikote · 30 karta</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="start-button" class="btn btn-primary" type="button">Jolasten hasi</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen" hidden>
+      <header class="game-head">
+        <div class="game-head-top">
+          <h2 class="game-title">Aurkitu bikoteak</h2>
+          <span id="progress-text" class="progress-text">0 / 5</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+      </header>
+
+      <div class="stats" aria-label="Jokoaren datuak">
+        <div class="stat">Bikoteak<strong id="matches-stat">0</strong></div>
+        <div class="stat">Saiakerak<strong id="attempts-stat">0</strong></div>
+        <div class="stat">Denbora<strong id="time-stat">00:00</strong></div>
+      </div>
+
+      <div id="message" class="message" aria-live="polite">
+        Irauli karta bat alde bakoitzean eta aurkitu itzulpen zuzena.
+      </div>
+
+      <div class="board">
+        <section class="language-zone" aria-labelledby="spanish-title">
+          <div class="zone-title">
+            <h3 id="spanish-title">Gaztelania</h3>
+            <span class="zone-chip">Esanahia</span>
+          </div>
+          <div id="spanish-grid" class="card-grid"></div>
+        </section>
+
+        <section class="language-zone" aria-labelledby="basque-title">
+          <div class="zone-title">
+            <h3 id="basque-title">Euskera</h3>
+            <span class="zone-chip">Euskaraz</span>
+          </div>
+          <div id="basque-grid" class="card-grid"></div>
+        </section>
+      </div>
+
+      <div class="game-footer">
+        <button id="leave-button" class="btn btn-secondary" type="button">Hasierara</button>
+      </div>
+    </section>
+
+    <section id="results-screen" class="screen" hidden>
+      <div class="hero">
+        <p class="eyebrow">Jokoa amaitu da</p>
+        <h1>Bikain!</h1>
+        <p class="hero-copy">Gaztelaniazko eta euskarazko karta guztiak lotu dituzu.</p>
+      </div>
+
+      <div class="setup">
+        <div class="result-main">
+          <div id="result-badge" class="result-badge">15</div>
+          <div class="result-copy">
+            <h2 id="result-title">15 bikote aurkituta</h2>
+            <p id="result-message">Hiztegi osoa osatu duzu.</p>
+          </div>
+        </div>
+
+        <div class="result-details">
+          <div class="result-detail">Bikoteak<strong id="result-matches">15</strong></div>
+          <div class="result-detail">Saiakerak<strong id="result-attempts">15</strong></div>
+          <div class="result-detail">Denbora<strong id="result-time">00:00</strong></div>
+        </div>
+
+        <div class="actions">
+          <button id="repeat-button" class="btn btn-primary" type="button">Berriro jokatu</button>
+          <button id="home-button" class="btn btn-secondary" type="button">Hasierara</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="help-dialog">
+    <div class="modal-head">
+      <h2>Nola jokatu</h2>
+      <button id="close-help" class="icon-btn" type="button" aria-label="Itxi">×</button>
+    </div>
+    <div class="modal-body">
+      <ol class="steps">
+        <li>Karta guztiak ahoz behera hasiko dira.</li>
+        <li>Irauli <strong>Gaztelania</strong> aldeko karta bat eta <strong>Euskera</strong> aldeko beste bat.</li>
+        <li>Itzulpen zuzenak badira, bi kartak agerian geratuko dira.</li>
+        <li>Ez badira bikotea, berriro ezkutatuko dira.</li>
+        <li>Aurkitu bikote guztiak ahalik eta saiakera gutxienetan.</li>
+      </ol>
+    </div>
+  </dialog>
+
+  <script>
+    "use strict";
+
+    const vocabulary = [
+      { id: "torpe", es: "Torpe, patoso", eu: "traketsa / baldar" },
+      { id: "adversario", es: "Adversario, enemigo", eu: "arerio / etsai" },
+      { id: "perezoso", es: "Perezoso, vago, holgazán", eu: "nagi / alfer" },
+      { id: "tacano", es: "Tacaño, avaro", eu: "zikoitz / zeken" },
+      { id: "alabar", es: "Alabar, elogiar", eu: "laudatu" },
+      { id: "nervioso", es: "Nervioso, inquieto", eu: "urduri / artega" },
+      { id: "verdadero", es: "Verdadero", eu: "benetako" },
+      { id: "elevar", es: "Elevar, alzar", eu: "goratu" },
+      { id: "generoso", es: "Generoso", eu: "eskuzabal" },
+      { id: "rechazar", es: "Rechazar", eu: "gaitzetsi" },
+      { id: "habil", es: "Hábil, diestro", eu: "trebe" },
+      { id: "falso", es: "Falso, ficticio", eu: "gezurrezko" },
+      { id: "observar", es: "Observar", eu: "behatu" },
+      { id: "esconder", es: "Esconder, ocultar", eu: "ezkutatu" },
+      { id: "grito", es: "Grito, alarido", eu: "deiadar" }
+    ];
+
+    const $ = selector => document.querySelector(selector);
+    const screens = [$("#start-screen"), $("#game-screen"), $("#results-screen")];
+    const spanishGrid = $("#spanish-grid");
+    const basqueGrid = $("#basque-grid");
+    const message = $("#message");
+
+    let selectedLevel = 5;
+    let activePairs = [];
+    let firstCard = null;
+    let locked = false;
+    let matches = 0;
+    let attempts = 0;
+    let startTime = 0;
+    let timerId = null;
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let index = copy.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
+      }
+      return copy;
+    }
+
+    function showScreen(screen) {
+      screens.forEach(item => { item.hidden = item !== screen; });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function formatTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+      const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+      return minutes + ":" + seconds;
+    }
+
+    function elapsedSeconds() {
+      return Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+    }
+
+    function updateTimer() {
+      $("#time-stat").textContent = formatTime(elapsedSeconds());
+    }
+
+    function updateStats() {
+      $("#matches-stat").textContent = matches;
+      $("#attempts-stat").textContent = attempts;
+      $("#progress-text").textContent = matches + " / " + activePairs.length;
+      $("#progress-bar").style.width = ((matches / activePairs.length) * 100) + "%";
+    }
+
+    function setMessage(text, type = "") {
+      message.textContent = text;
+      message.className = "message" + (type ? " " + type : "");
+    }
+
+    function createCard(pair, language) {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "memory-card";
+      card.dataset.pair = pair.id;
+      card.dataset.language = language;
+      card.setAttribute("aria-pressed", "false");
+      card.setAttribute("aria-label", language === "es" ? "Gaztelaniazko karta ezkutua" : "Euskarazko karta ezkutua");
+
+      const inner = document.createElement("span");
+      inner.className = "card-inner";
+
+      const back = document.createElement("span");
+      back.className = "card-face card-back";
+      back.setAttribute("aria-hidden", "true");
+      const question = document.createElement("span");
+      question.className = "question-mark";
+      question.textContent = "?";
+      back.append(question);
+
+      const front = document.createElement("span");
+      front.className = "card-face card-front";
+      front.textContent = language === "es" ? pair.es : pair.eu;
+
+      inner.append(back, front);
+      card.append(inner);
+      card.addEventListener("click", () => revealCard(card));
+      return card;
+    }
+
+    function renderBoard() {
+      spanishGrid.replaceChildren();
+      basqueGrid.replaceChildren();
+
+      shuffle(activePairs).forEach(pair => spanishGrid.append(createCard(pair, "es")));
+      shuffle(activePairs).forEach(pair => basqueGrid.append(createCard(pair, "eu")));
+    }
+
+    function startGame() {
+      activePairs = selectedLevel === vocabulary.length
+        ? shuffle(vocabulary)
+        : shuffle(vocabulary).slice(0, selectedLevel);
+      firstCard = null;
+      locked = false;
+      matches = 0;
+      attempts = 0;
+      startTime = Date.now();
+      clearInterval(timerId);
+      timerId = setInterval(updateTimer, 1000);
+      $("#time-stat").textContent = "00:00";
+      setMessage("Irauli karta bat alde bakoitzean eta aurkitu itzulpen zuzena.");
+      updateStats();
+      renderBoard();
+      showScreen($("#game-screen"));
+    }
+
+    function revealCard(card) {
+      if (locked || card.classList.contains("matched")) return;
+
+      if (card === firstCard) {
+        hideCard(card);
+        firstCard = null;
+        setMessage("Aukeratu karta bat alde bakoitzean.");
+        return;
+      }
+
+      if (firstCard && firstCard.dataset.language === card.dataset.language) {
+        hideCard(firstCard);
+        firstCard = null;
+      }
+
+      card.classList.add("revealed", "selected");
+      card.setAttribute("aria-pressed", "true");
+      card.setAttribute("aria-label", card.querySelector(".card-front").textContent);
+
+      if (!firstCard) {
+        firstCard = card;
+        const otherLanguage = card.dataset.language === "es" ? "euskarazko" : "gaztelaniazko";
+        setMessage("Orain aukeratu " + otherLanguage + " karta.");
+        return;
+      }
+
+      attempts += 1;
+      updateStats();
+      compareCards(firstCard, card);
+    }
+
+    function compareCards(cardA, cardB) {
+      locked = true;
+      cardA.classList.remove("selected");
+      cardB.classList.remove("selected");
+
+      if (cardA.dataset.pair === cardB.dataset.pair) {
+        cardA.classList.add("matched");
+        cardB.classList.add("matched");
+        cardA.disabled = true;
+        cardB.disabled = true;
+        matches += 1;
+        firstCard = null;
+        locked = false;
+        updateStats();
+        setMessage("Bikote zuzena! Jarraitu hurrengo itzulpenarekin.", "correct");
+
+        if (matches === activePairs.length) {
+          window.setTimeout(finishGame, 450);
+        }
+        return;
+      }
+
+      cardA.classList.add("mismatch");
+      cardB.classList.add("mismatch");
+      setMessage("Ez dira bikotea. Begiratu berriro bi hitzak.", "error");
+
+      window.setTimeout(() => {
+        cardA.classList.remove("mismatch");
+        cardB.classList.remove("mismatch");
+        hideCard(cardA);
+        hideCard(cardB);
+        firstCard = null;
+        locked = false;
+        setMessage("Saiatu berriro: aukeratu karta bat alde bakoitzean.");
+      }, 900);
+    }
+
+    function hideCard(card) {
+      card.classList.remove("revealed", "selected");
+      card.setAttribute("aria-pressed", "false");
+      card.setAttribute("aria-label", card.dataset.language === "es" ? "Gaztelaniazko karta ezkutua" : "Euskarazko karta ezkutua");
+    }
+
+    function finishGame() {
+      clearInterval(timerId);
+      const totalTime = elapsedSeconds();
+      const levelName = selectedLevel === 5 ? "Erraza" : selectedLevel === 10 ? "Zaila" : "Finala";
+      $("#result-badge").textContent = matches;
+      $("#result-title").textContent = matches + " bikote aurkituta";
+      $("#result-message").textContent = levelName + " maila osatu duzu.";
+      $("#result-matches").textContent = matches;
+      $("#result-attempts").textContent = attempts;
+      $("#result-time").textContent = formatTime(totalTime);
+      showScreen($("#results-screen"));
+    }
+
+    document.querySelectorAll("[data-level]").forEach(button => {
+      button.addEventListener("click", () => {
+        selectedLevel = Number(button.dataset.level);
+        document.querySelectorAll("[data-level]").forEach(option => {
+          option.setAttribute("aria-pressed", String(option === button));
+        });
+      });
+    });
+
+    $("#start-button").addEventListener("click", startGame);
+    $("#repeat-button").addEventListener("click", startGame);
+    $("#home-button").addEventListener("click", () => showScreen($("#start-screen")));
+    $("#leave-button").addEventListener("click", () => {
+      clearInterval(timerId);
+      showScreen($("#start-screen"));
+    });
+
+    const helpDialog = $("#help-dialog");
+    $("#help-top").addEventListener("click", () => helpDialog.showModal());
+    $("#close-help").addEventListener("click", () => helpDialog.close());
+    helpDialog.addEventListener("click", event => {
+      if (event.target === helpDialog) helpDialog.close();
+    });
+  </script>
+</body>
+</html>
